@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkVenom - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #444;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: #ff4444;
+            margin: 0;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #ff4444;
+        }
+
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bottom-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid #444;
+            z-index: 1000;
+        }
+
+        .bottom-toolbar a {
+            color: #e0e0e0;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .bottom-toolbar a:hover, .bottom-toolbar a.active {
+            color: #ff4444;
+        }
+
+        .cover-slideshow {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #444;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .cover-slideshow img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .cover-slideshow img.active {
+            opacity: 1;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #ff4444;
+            margin: 30px 0 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title a {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .section-title a:hover {
+            color: #ff4444;
+        }
+
+        .book-covers {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #1a1a1a;
+        }
+
+        .book-covers::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .book-covers::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .book-covers::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+
+        .book-cover {
+            width: 150px;
+            height: 200px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+        }
+
+        .book-cover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-cover .title-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 0 0 10px 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .book-cover:hover .title-overlay {
+            opacity: 1;
+        }
+
+        .story-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .story-view.active {
+            display: flex;
+        }
+
+        .story-view-content {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .story-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .story-view-header h3 {
+            font-size: 1.5rem;
+            color: #ff4444;
+            margin: 0;
+        }
+
+        .story-view-header button {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .story-view-body {
+            display: flex;
+            gap: 20px;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .story-view-body {
+                flex-direction: row;
+            }
+        }
+
+        .story-view-cover {
+            width: 200px;
+            height: 300px;
+            background: #333;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .story-view-cover {
+                margin: 0;
+            }
+        }
+
+        .story-view-details {
+            flex: 1;
+        }
+
+        .story-view-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .story-view-stats div {
+            text-align: center;
+        }
+
+        .story-view-stats h4 {
+            font-size: 1rem;
+            color: #ff4444;
+            margin: 0;
+        }
+
+        .story-view-stats p {
+            font-size: 0.9rem;
+            color: #cccccc;
+            margin: 5px 0 0;
+        }
+
+        .story-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #bbb;
+            font-size: 0.95rem;
+        }
+
+        .story-view-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .story-view-actions button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .story-view-actions button:hover {
+            background: #444;
+        }
+
+        .story-view-actions button.primary {
+            background: #ff4444;
+        }
+
+        .story-view-actions button.primary:hover {
+            background: #ff6666;
+        }
+
+        .story-view-actions button.added {
+            background: #2a6b2a;
+            cursor: not-allowed;
+        }
+
+        .story-view-toc {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .story-view-toc h4 {
+            font-size: 1rem;
+            color: #ff4444;
+            margin: 0 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .story-view-toc h4 span {
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .story-view-toc h4 span:hover {
+            color: #ff4444;
+        }
+
+        .story-view-toc ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .story-view-toc li {
+            font-size: 0.9rem;
+            color: #cccccc;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #3a3a3a;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .story-view-toc li:hover {
+            color: #ff4444;
+        }
+
+        .story-view-toc li:last-child {
+            border-bottom: none;
+        }
+
+        .loading-placeholder {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, -10px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DarkVenom</h1>
+        <div class="profile-icon" onclick="window.location.href='userprofile.html'">
+            <img id="profilePhoto" src="https://via.placeholder.com/40" alt="Profile Photo">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="cover-slideshow">
+            <img id="coverPhoto1" src="https://via.placeholder.com/1200x400/333/666?text=Featured+Story+1" alt="Cover Photo 1" class="active">
+            <img id="coverPhoto2" src="https://via.placeholder.com/1200x400/444/777?text=Featured+Story+2" alt="Cover Photo 2">
+            <img id="coverPhoto3" src="https://via.placeholder.com/1200x400/222/555?text=Featured+Story+3" alt="Cover Photo 3">
+            <img id="coverPhoto4" src="https://via.placeholder.com/1200x400/333/888?text=Featured+Story+4" alt="Cover Photo 4">
+            <img id="coverPhoto5" src="https://via.placeholder.com/1200x400/111/444?text=Featured+Story+5" alt="Cover Photo 5">
+        </div>
+
+        <div class="section-title">
+            <h2>Your Stories</h2>
+            <a href="your-stories.html">See All</a>
+        </div>
+        <div class="book-covers" id="yourStoriesContainer">
+            <!-- Book covers will be loaded dynamically -->
+        </div>
+
+        <div class="section-title">
+            <h2>Featured Stories</h2>
+            <a href="featured.html">See All</a>
+        </div>
+        <div class="book-covers" id="featuredContainer">
+            <!-- Book covers will be loaded dynamically -->
+        </div>
+
+        <div class="section-title">
+            <h2>Fantasy</h2>
+            <a href="fantasy.html">See All</a>
+        </div>
+        <div class="book-covers" id="fantasyContainer">
+            <!-- Book covers will be loaded dynamically -->
+        </div>
+
+        <div class="section-title">
+            <h2>Sci-Fi</h2>
+            <a href="scifi.html">See All</a>
+        </div>
+        <div class="book-covers" id="sciFiContainer">
+            <!-- Book covers will be loaded dynamically -->
+        </div>
+    </div>
+
+    <div class="bottom-toolbar">
+        <a href="index.html" class="active"><i class="fas fa-home"></i></a>
+        <a href="searchbar.html"><i class="fas fa-search"></i></a>
+        <a href="library.html"><i class="fas fa-book"></i></a>
+        <a href="write.html"><i class="fas fa-pen"></i></a>
+        <a href="notifications.html"><i class="fas fa-bell"></i></a>
+    </div>
+
+    <div class="story-view" id="storyView">
+        <div class="story-view-content">
+            <div class="story-view-header">
+                <h3 id="storyViewTitle">Story Title</h3>
+                <button onclick="hideStoryView()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="story-view-body">
+                <div class="story-view-cover" id="storyViewCover"></div>
+                <div class="story-view-details">
+                    <div class="story-view-stats">
+                        <div>
+                            <h4>Reads</h4>
+                            <p id="storyViewReads">100K</p>
+                        </div>
+                        <div>
+                            <h4>Votes</h4>
+                            <p id="storyViewVotes">120K</p>
+                        </div>
+                        <div>
+                            <h4>Chapters</h4>
+                            <p id="storyViewChapters">35</p>
+                        </div>
+                    </div>
+                    <div class="story-description" id="storyViewDescription">
+                        Loading story description...
+                    </div>
+                    <div class="story-view-actions">
+                        <button class="primary" onclick="readStory()"><i class="fas fa-book-open"></i> Read</button>
+                        <button id="addToLibraryBtn" onclick="addToLibrary()"><i class="fas fa-plus"></i> Add to Library</button>
+                    </div>
+                    <div class="story-view-toc">
+                        <h4>Table of Contents <span onclick="toggleAllChapters()">View All</span></h4>
+                        <ul id="storyViewToc">
+                            <li>Loading chapters...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Story added to your library!</div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzj27wW_-2PNyQdJI6GEIhSUTXn4JtDbU",
+            authDomain: "darvenom-official.firebaseapp.com",
+            databaseURL: "https://darvenom-official-default-rtdb.firebaseio.com",
+            projectId: "darvenom-official",
+            storageBucket: "darvenom-official.firebasestorage.app",
+            messagingSenderId: "183243030955",
+            appId: "1:183243030955:web:9af255c223c71b2a1852ee",
+            measurementId: "G-MSE0QKP11N"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Make Firebase services available globally
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
+        window.firebaseAuth = auth;  
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                loadUserData(user.uid);
+                // Use the Firebase Auth photoURL if available    
+                document.getElementById('profilePhoto').src = user.photoURL || 'https://via.placeholder.com/40?text=User';
+
+            } else {
+                // User is signed out, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load user data from Firebase
+        async function loadUserData(userId) {
+            try {
+                const userRef = ref(database, `users/${userId}`);
+                const snapshot = await get(userRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    // You can use userData to personalize the UI
+                    console.log("User data loaded:", userData);
+
+                    //Check for existing profilePhotoUrl in Firebase and use that
+                    const profilePhotoUrl = userData.profilePhotoUrl;
+                    if(profilePhotoUrl) {
+                        document.getElementById('profilePhoto').src = profilePhotoUrl;
+                    }
+                } else {
+                    console.log("No user data available");
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+            }
+        }
+
+        // Make the function available globally
+        window.loadUserData = loadUserData;
+    </script>
+
+    <script>
+        // Story data (in a real app, this would come from a database)
+        const storyData = {
+            yourStories: [
+                { id: 'story1', title: 'Highschool Detectives', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=Highschool+Detectives', reads: '15K', votes: '8.2K', chapters: 12, description: 'A group of high school students form a detective club to solve mysteries in their town. As they tackle increasingly complex cases, they uncover a conspiracy that threatens the entire city.' },
+                { id: 'story2', title: 'Love, Haru', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=Love,+Haru', reads: '32K', votes: '18K', chapters: 24, description: 'Haru finds herself caught between her childhood friend and a mysterious transfer student. As she navigates her feelings, she discovers that both boys harbor secrets that could change everything.' },
+                { id: 'story3', title: 'Mia is Missing', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=Mia+is+Missing', reads: '45K', votes: '22K', chapters: 18, description: 'When popular student Mia disappears without a trace, her best friend Emma takes it upon herself to find out what happened, uncovering dark secrets about their seemingly perfect suburban town.' },
+                { id: 'story4', title: 'Flower of Youth', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=Flower+of+Youth', reads: '28K', votes: '14K', chapters: 15, description: 'A coming-of-age story about five friends navigating their final year of high school, dealing with love, loss, and the bittersweet reality of growing up and potentially growing apart.' }
+            ],
+            featured: [
+                { id: 'story5', title: 'The Forgotten Kingdom', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Forgotten+Kingdom', reads: '120K', votes: '78K', chapters: 42, description: 'An epic fantasy adventure where a young farmhand discovers they are the heir to an ancient, forgotten kingdom. With the help of unlikely allies, they must reclaim their birthright and defeat the dark forces that threaten the realm.' },
+                { id: 'story6', title: 'The Secret Garden', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Secret+Garden', reads: '95K', votes: '62K', chapters: 30, description: 'After moving to her uncle\'s mansion, a young girl discovers a hidden garden with magical properties. As she tends to the garden, she uncovers family secrets and finds healing for herself and those around her.' },
+                { id: 'story7', title: 'The Final Battle', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Final+Battle', reads: '150K', votes: '92K', chapters: 36, description: 'The thrilling conclusion to the epic saga. Our heroes must gather their allies for one last stand against the forces of darkness that threaten to engulf the world in eternal shadow.' }
+            ],
+            fantasy: [
+                { id: 'story8', title: 'The Dragon\'s Lair', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Dragon\'s+Lair', reads: '85K', votes: '56K', chapters: 28, description: 'A young dragon tamer embarks on a dangerous quest to find the legendary Dragon\'s Lair, hoping to form a bond with the most powerful dragon in existence to save her village from destruction.' },
+                { id: 'story9', title: 'The Wizard\'s Tower', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Wizard\'s+Tower', reads: '72K', votes: '48K', chapters: 24, description: 'An apprentice wizard accidentally unlocks a forbidden floor in his master\'s tower, releasing ancient magic and entities that have been sealed away for centuries. Now he must fix his mistake before it\'s too late.' },
+                { id: 'story10', title: 'The Elven Forest', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Elven+Forest', reads: '68K', votes: '42K', chapters: 22, description: 'When humans begin encroaching on their ancient forest, the elves must decide whether to remain hidden or reveal themselves to the world. A tale of tradition versus progress, and finding common ground between different cultures.' }
+            ],
+            sciFi: [
+                { id: 'story11', title: 'Galactic Wars', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=Galactic+Wars', reads: '110K', votes: '75K', chapters: 38, description: 'In the far future, humanity has colonized the stars but faces extinction at the hands of a mysterious alien race. The fate of the galaxy rests on the shoulders of a ragtag crew aboard the last advanced starship.' },
+                { id: 'story12', title: 'The Time Machine', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Time+Machine', reads: '92K', votes: '64K', chapters: 26, description: 'A brilliant scientist creates a device that allows travel through time, only to discover that changing the past has catastrophic consequences for the future. A race against time ensues to restore the proper timeline.' },
+                { id: 'story13', title: 'The Alien Invasion', cover: 'https://via.placeholder.com/150x200/333/ff4444?text=The+Alien+Invasion', reads: '88K', votes: '58K', chapters: 32, description: 'When Earth is invaded by a technologically superior alien species, a small group of survivors must find a way to exploit the one weakness of the invaders before humanity is completely subjugated.' }
+            ]
+        };
+
+        // Current story being viewed
+        let currentStory = null;
+        let userLibrary = [];
+
+        // DOM elements
+        const storyView = document.getElementById('storyView');
+        const storyViewCover = document.getElementById('storyViewCover');
+        const storyViewTitle = document.getElementById('storyViewTitle');
+        const storyViewReads = document.getElementById('storyViewReads');
+        const storyViewVotes = document.getElementById('storyViewVotes');
+        const storyViewChapters = document.getElementById('storyViewChapters');
+        const storyViewDescription = document.getElementById('storyViewDescription');
+        const storyViewToc = document.getElementById('storyViewToc');
+        const addToLibraryBtn = document.getElementById('addToLibraryBtn');
+        const toast = document.getElementById('toast');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+
+
+            // Load book covers
+            loadBookCovers();
+            
+            // Start slideshow
+            startSlideshow();
+        });
+
+        // Load book covers for all sections
+        function loadBookCovers() {
+            // For each section, create book covers
+            Object.keys(storyData).forEach(section => {
+                const container = document.getElementById(`${section}Container`);
+                if (!container) return;
+                
+                // Clear container
+                container.innerHTML = '';
+                
+                // Add book covers
+                storyData[section].forEach(story => {
+                    const bookCover = document.createElement('div');
+                    bookCover.className = 'book-cover';
+                    bookCover.style.backgroundImage = `url('${story.cover}')`;
+                    bookCover.setAttribute('data-id', story.id);
+                    bookCover.onclick = () => showStoryView(story.id);
+                    
+                    // Add title overlay
+                    const titleOverlay = document.createElement('div');
+                    titleOverlay.className = 'title-overlay';
+                    titleOverlay.textContent = story.title;
+                    bookCover.appendChild(titleOverlay);
+                    
+                    container.appendChild(bookCover);
+                });
+            });
+        }
+
+        // Slideshow functionality
+        const slides = document.querySelectorAll('.cover-slideshow img');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function startSlideshow() {
+            setInterval(nextSlide, 5000);
+        }
+
+        // Find a story by ID across all categories
+        function findStoryById(storyId) {
+            for (const category in storyData) {
+                const story = storyData[category].find(s => s.id === storyId);
+                if (story) return story;
+            }
+            return null;
+        }
+
+        // Show story view modal
+        function showStoryView(storyId) {
+            const story = findStoryById(storyId);
+            if (!story) return;
+            
+            currentStory = story;
+            
+            // Update story view content
+            storyViewCover.style.backgroundImage = `url('${story.cover}')`;
+            storyViewTitle.textContent = story.title;
+            storyViewReads.textContent = story.reads;
+            storyViewVotes.textContent = story.votes;
+            storyViewChapters.textContent = story.chapters;
+            storyViewDescription.textContent = story.description;
+            
+            // Generate table of contents
+            storyViewToc.innerHTML = '';
+            for (let i = 1; i <= story.chapters; i++) {
+                const li = document.createElement('li');
+                li.textContent = `Chapter ${i}: ${i === 1 ? story.title : generateChapterTitle()}`;
+                li.onclick = () => readChapter(i);
+                storyViewToc.appendChild(li);
+                
+                // Only show first 5 chapters initially
+                if (i === 5 && story.chapters > 5) {
+                    const li = document.createElement('li');
+                    li.textContent = `+ ${story.chapters - 5} more chapters`;
+                    li.style.color = '#999';
+                    li.onclick = toggleAllChapters;
+                    storyViewToc.appendChild(li);
+                    break;
+                }
+            }
+            
+            // Check if story is in library
+            updateLibraryButton();
+            
+            // Show the modal
+            storyView.classList.add('active');
+        }
+
+        // Hide story view modal
+        function hideStoryView() {
+            storyView.classList.remove('active');
+            currentStory = null;
+        }
+
+        // Add current story to library
+        function addToLibrary() {
+            if (!currentStory) return;
+            
+            // Check if already in library
+            if (userLibrary.includes(currentStory.id)) return;
+            
+            // Add to library
+            userLibrary.push(currentStory.id);
+            localStorage.setItem('userLibrary', JSON.stringify(userLibrary));
+            
+            // Update button
+            updateLibraryButton();
+            
+            // Show toast notification
+            showToast('Story added to your library!');
+        }
+
+        // Update library button state
+        function updateLibraryButton() {
+            if (!currentStory) return;
+            
+            if (userLibrary.includes(currentStory.id)) {
+                addToLibraryBtn.innerHTML = '<i class="fas fa-check"></i> In Library';
+                addToLibraryBtn.classList.add('added');
+                addToLibraryBtn.disabled = false;
+            }
+        }
+
+        // Show all chapters in TOC
+        function toggleAllChapters() {
+            if (!currentStory) return;
+            
+            const showingAll = storyViewToc.children.length >= currentStory.chapters;
+            
+            if (showingAll) {
+                // Show only first 5
+                storyViewToc.innerHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = `Chapter ${i}: ${i === 1 ? currentStory.title : generateChapterTitle()}`;
+                    li.onclick = () => readChapter(i);
+                    storyViewToc.appendChild(li);
+                }
+                
+                if (currentStory.chapters > 5) {
+                    const li = document.createElement('li');
+                    li.textContent = `+ ${currentStory.chapters - 5} more chapters`;
+                    li.style.color = '#999';
+                    li.onclick = toggleAllChapters;
+                    storyViewToc.appendChild(li);
+                }
+            } else {
+                // Show all chapters
+                storyViewToc.innerHTML = '';
+                for (let i = 1; i <= currentStory.chapters; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = `Chapter ${i}: ${i === 1 ? currentStory.title : generateChapterTitle()}`;
+                    li.onclick = () => readChapter(i);
+                    storyViewToc.appendChild(li);
+                }
+            }
+        }
+
+        // Generate a random chapter title
+        function generateChapterTitle() {
+            const titles = [
+                'The Beginning', 'Unexpected Turn', 'Revelations', 'The Journey', 
+                'Confrontation', 'New Allies', 'The Secret', 'Betrayal', 
+                'The Plan', 'Darkness Falls', 'Hope Rises', 'The Challenge',
+                'Lost and Found', 'The Truth', 'Reunion', 'The Decision',
+                'Breaking Point', 'The Sacrifice', 'New Horizons', 'The End?'
+            ];
+            return titles[Math.floor(Math.random() * titles.length)];
+        }
+
+        // Read the current story
+        function readStory() {
+            if (!currentStory) return;
+            window.location.href = `read.html?story=${currentStory.id}&chapter=1`;
+        }
+
+        // Read a specific chapter
+        function readChapter(chapterNumber) {
+            if (!currentStory) return;
+            window.location.href = `read.html?story=${currentStory.id}&chapter=${chapterNumber}`;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make functions available globally
+        window.showStoryView = showStoryView;
+        window.hideStoryView = hideStoryView;
+        window.addToLibrary = addToLibrary;
+        window.toggleAllChapters = toggleAllChapters;
+        window.readStory = readStory;
+        window.readChapter = readChapter;
+    </script>
+</body>
+</html>
